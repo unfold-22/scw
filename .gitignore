@@ -11,3 +11,5 @@ artifacts
 
 bin
 .vscode
+deployments
+yarn-error.log
