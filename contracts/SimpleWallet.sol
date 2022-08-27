@@ -6,6 +6,7 @@ pragma solidity ^0.8.12;
 /* solhint-disable reason-string */
 
 import './core/BaseWallet.sol';
+import 'hardhat/console.sol';
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 
 /**
@@ -50,6 +51,14 @@ contract SimpleWallet is BaseWallet {
         _;
     }
 
+    function getChainID() external view returns (uint256) {
+        uint256 id;
+        assembly {
+            id := chainid()
+        }
+        return id;
+    }
+
     function _onlyOwner() internal view {
         //directly from EOA owner, or through the entryPoint (which gets redirected through execFromEntryPoint)
         require(
@@ -79,14 +88,25 @@ contract SimpleWallet is BaseWallet {
     /**
      * execute a sequence of transaction
      */
-    function execBatch(address[] calldata dest, bytes[] calldata func)
-        external
-        onlyOwner
-    {
+    function execBatch(
+        address[] calldata dest,
+        uint256[] calldata values,
+        bytes[] calldata func
+    ) external {
+        console.log('yaha aya h?');
         require(dest.length == func.length, 'wrong array lengths');
         for (uint256 i = 0; i < dest.length; i++) {
-            _call(dest[i], 0, func[i]);
+            console.log(dest[i]);
+            _call(dest[i], values[i], func[i]);
         }
+    }
+
+    function viewCall(
+        address dest,
+        uint256 value,
+        bytes calldata func
+    ) external view returns (bytes) {
+        return _call(dest, value, func);
     }
 
     /**
@@ -143,10 +163,13 @@ contract SimpleWallet is BaseWallet {
         address
     ) internal view virtual override {
         bytes32 hash = requestId.toEthSignedMessageHash();
+        console.logBytes32(hash);
+        console.log(hash.recover(userOp.signature));
         require(
             owner == hash.recover(userOp.signature),
             'wallet: wrong signature'
         );
+        console.log('sahi to hb sab');
     }
 
     function _call(
@@ -155,6 +178,7 @@ contract SimpleWallet is BaseWallet {
         bytes memory data
     ) internal {
         (bool success, bytes memory result) = target.call{value: value}(data);
+        console.log(success);
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))

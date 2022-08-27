@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.12;
 
+import 'hardhat/console.sol';
 import '../core/EntryPoint.sol';
 import 'solidity-string-utils/StringUtils.sol';
 
@@ -22,16 +23,16 @@ contract BundlerHelper {
         ep.handleOps(ops, beneficiary);
         paid = beneficiary.balance - preBalance;
         if (paid < expectedPayment) {
-            revert(
-                string.concat(
-                    "didn't pay enough: paid ",
-                    paid.toString(),
-                    ' expected ',
-                    expectedPayment.toString(),
-                    ' gasPrice ',
-                    gasPrice.toString()
-                )
-            );
+            // revert(
+            //     string.concat(
+            //         "didn't pay enough: paid ",
+            //         paid.toString(),
+            //         ' expected ',
+            //         expectedPayment.toString(),
+            //         ' gasPrice ',
+            //         gasPrice.toString()
+            //     )
+            // );
         }
     }
 }

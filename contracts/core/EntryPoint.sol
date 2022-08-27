@@ -9,6 +9,7 @@ pragma solidity ^0.8.12;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
+import 'hardhat/console.sol';
 import '../interfaces/IWallet.sol';
 import '../interfaces/IPaymaster.sol';
 
@@ -59,6 +60,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         UserOpInfo memory opInfo
     ) private returns (uint256 collected) {
         uint256 preGas = gasleft();
+        console.log(preGas);
         bytes memory context = getMemoryBytesFromOffset(opInfo.contextOffset);
 
         try this.innerHandleOp(userOp.callData, opInfo, context) returns (
@@ -97,9 +99,12 @@ contract EntryPoint is IEntryPoint, StakeManager {
                 _validatePrepayment(i, ops[i], opInfos[i], address(0));
             }
 
+            console.log('caloidation completed?');
+
             uint256 collected = 0;
 
             for (uint256 i = 0; i < opslen; i++) {
+                console.log('first operation');
                 collected += _executeUserOp(i, ops[i], opInfos[i]);
             }
 
@@ -194,14 +199,19 @@ contract EntryPoint is IEntryPoint, StakeManager {
         bytes calldata context
     ) external returns (uint256 actualGasCost) {
         uint256 preGas = gasleft();
+        console.log('inner handleop');
         require(msg.sender == address(this));
         MemoryUserOp memory mUserOp = opInfo.mUserOp;
 
         IPaymaster.PostOpMode mode = IPaymaster.PostOpMode.opSucceeded;
         if (callData.length > 0) {
+            console.log('calling the function');
+            console.log(address(mUserOp.sender));
+
             (bool success, bytes memory result) = address(mUserOp.sender).call{
                 gas: mUserOp.callGasLimit
             }(callData);
+            console.log(success);
             if (!success) {
                 if (result.length > 0) {
                     emit UserOperationRevertReason(

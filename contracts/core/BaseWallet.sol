@@ -6,6 +6,7 @@ pragma solidity ^0.8.12;
 /* solhint-disable reason-string */
 
 import '../interfaces/IWallet.sol';
+import 'hardhat/console.sol';
 import '../interfaces/IEntryPoint.sol';
 
 /**
@@ -45,7 +46,9 @@ abstract contract BaseWallet is IWallet {
         if (userOp.initCode.length == 0) {
             _validateAndUpdateNonce(userOp);
         }
+        console.log('yaha tk aega');
         _payPrefund(missingWalletFunds);
+        console.log('yaha phat jaega');
     }
 
     /**
@@ -90,6 +93,7 @@ abstract contract BaseWallet is IWallet {
      *  this value MAY be zero, in case there is enough deposit, or the userOp has a paymaster.
      */
     function _payPrefund(uint256 missingWalletFunds) internal virtual {
+        console.log(missingWalletFunds);
         if (missingWalletFunds != 0) {
             (bool success, ) = payable(msg.sender).call{
                 value: missingWalletFunds,
