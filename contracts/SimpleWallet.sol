@@ -101,14 +101,6 @@ contract SimpleWallet is BaseWallet {
         }
     }
 
-    function viewCall(
-        address dest,
-        uint256 value,
-        bytes calldata func
-    ) external view returns (bytes) {
-        return _call(dest, value, func);
-    }
-
     /**
      * change entry-point:
      * a wallet must have a method for replacing the entryPoint, in case the the entryPoint is
